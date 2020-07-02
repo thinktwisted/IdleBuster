@@ -26,10 +26,12 @@ while run:
     currentTime = getIdleTime()
     #print("Idle time [sec]: " + str(currentTime))
     if (currentTime) > idleTime:
-        currentPosition = gui.position()
-        gui.moveTo(currentPosition[0]+50, currentPosition[1]+50, duration=1)
-        gui.moveTo(currentPosition[0], currentPosition[1], duration=1)
-        print('Mouse just wiggled, idle time was %s' % str(currentTime))
+        #currentPosition = gui.position()
+        #gui.moveTo(currentPosition[0]+50, currentPosition[1]+50, duration=0.5)
+        for i in range(2):
+            gui.press('shift')
+        #gui.moveTo(currentPosition[0], currentPosition[1], duration=1)
+        print('Shift pressed idle time was %s' % str(currentTime))
         wiggleCount += 1
         try:
             for i in range(idleTime-5):
@@ -41,5 +43,5 @@ while run:
         try:
             time.sleep(1)
         except KeyboardInterrupt:
-            print('Exiting, total wiggles: %s' % str(wiggleCount))
+            print('Exiting, total presses: %s' % str(wiggleCount))
             run = False

@@ -24,13 +24,10 @@ print('Target time [sec]: ' + str(idleTime))
 
 while run:
     currentTime = getIdleTime()
-    #print("Idle time [sec]: " + str(currentTime))
     if (currentTime) > idleTime:
-        #currentPosition = gui.position()
-        #gui.moveTo(currentPosition[0]+50, currentPosition[1]+50, duration=0.5)
         for i in range(2):
             gui.press('shift')
-        #gui.moveTo(currentPosition[0], currentPosition[1], duration=1)
+            time.sleep(1)
         print('Shift pressed idle time was %s' % str(currentTime))
         wiggleCount += 1
         try:

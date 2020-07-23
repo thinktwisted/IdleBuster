@@ -1,5 +1,6 @@
-#! python3
+#!python3
 # IdleBuster.py - a simple program to keep your computer wake
+
 import win32api, time
 import pyautogui as gui
 
@@ -11,7 +12,7 @@ validInput = False
 run = True
 
 while not validInput:
-    idleTime = (gui.prompt('What is your idle time [1-60 minutes]?'))
+    idleTime = input('What is your idle time [1-60 minutes]? ')
     try:
         int(idleTime)
         break;
@@ -26,12 +27,12 @@ print('Idle time [sec]: ' + str(idleTime))
 
 while run:
     currentTime = getIdleTime()
-    if (currentTime) > idleTime-1:
+    if (currentTime) > idleTime-1.5:
         for i in range(2):
             gui.press('shift')
             time.sleep(1)
-        print('Shift pressed idle time was %s' % str(currentTime))
         wiggleCount += 1
+        print('%s - Shift pressed idle time was %s' % (str(wiggleCount), str(currentTime)))
         try:
             for i in range(idleTime-2):
                 time.sleep(1)

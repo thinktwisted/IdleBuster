@@ -11,7 +11,8 @@ apps like Microsoft Teams or Slack keep showing you as *Active*.
 2. Polls the real system idle time every second
    (`win32api.GetTickCount() - win32api.GetLastInputInfo()`).
 3. When idle time reaches the threshold, it presses **Shift** twice (Win32
-   `keybd_event` via `ctypes`), then waits roughly one full timeout period.
+   `keybd_event` via `ctypes`) and keeps polling; the idle timer never crosses
+   the configured timeout.
 4. On `Ctrl+C` it prints how many idle periods were prevented and exits.
 
 ## Requirements
@@ -46,8 +47,8 @@ Set the value to match your actual Windows lock/sleep timeout
 (*Settings → System → Power & battery → Screen and sleep*). If you enter more
 than the real timeout, Windows will still lock/sleep first.
 
-Stop with `Ctrl+C` in the console window. The script only runs while that
-window is open — closing it stops IdleBuster.
+Stop with `Ctrl+C` at any point, including the prompt. The script only runs
+while that window is open — closing it stops IdleBuster.
 
 ## Limitations
 
@@ -65,9 +66,9 @@ window is open — closing it stops IdleBuster.
   It injects no input, but apps that watch for *real* user input (Teams "Away"
   status) will still flip to away — the keystroke approach here does not have
   that problem.
-- Each check-after-wiggle cycle runs slightly longer than the configured
-  timeout (poll overhead + fixed sleeps). If your lock timeout is exactly at
-  the edge, set your value a minute lower.
+- Wakes fire at fixed one-second sampling intervals, so detection lands within
+  ~1 s of the threshold no matter how long the configured timeout is; sleep
+  overshoot does not accumulate across cycles.
 
 ## License
 

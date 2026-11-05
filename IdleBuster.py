@@ -16,40 +16,39 @@ def pressShift():
     ctypes.windll.user32.keybd_event(VK_SHIFT, 0, 0, 0)
     ctypes.windll.user32.keybd_event(VK_SHIFT, 0, KEYEVENTF_KEYUP, 0)
 
-validInput = False
-run = True
-
-while not validInput:
-    try:
-        idleMinutes = int(input('What is your idle time [1-60 minutes]? '))
-    except ValueError:
-        continue
-    if 1 <= idleMinutes <= 60:
-        validInput = True
-    else:
+def askIdleMinutes():
+    '''A function to prompt for the idle timeout until 1-60 minutes is given'''
+    while True:
+        try:
+            idleMinutes = int(input('What is your idle time [1-60 minutes]? '))
+        except ValueError:
+            continue
+        except (KeyboardInterrupt, EOFError):
+            print('Exiting, no idle time given')
+            return None
+        if 1 <= idleMinutes <= 60:
+            return idleMinutes
         print('%s is out of range, enter 1-60' % str(idleMinutes))
 
-idleTime = idleMinutes*60
-wiggleCount = 0
-print('Idle time [sec]: ' + str(idleTime))
+def main():
+    idleMinutes = askIdleMinutes()
+    if idleMinutes is None:
+        return
+    idleTime = idleMinutes*60
+    wiggleCount = 0
+    print('Idle time [sec]: ' + str(idleTime))
+    try:
+        while True:
+            currentTime = getIdleTime()
+            if currentTime > idleTime-1.5:
+                for _ in range(2):
+                    pressShift()
+                    time.sleep(1)
+                wiggleCount += 1
+                print('%s - Shift pressed idle time was %s' % (str(wiggleCount), str(currentTime)))
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print('Exiting, total idles avoided: %s' % str(wiggleCount))
 
-while run:
-    currentTime = getIdleTime()
-    if (currentTime) > idleTime-1.5:
-        for i in range(2):
-            pressShift()
-            time.sleep(1)
-        wiggleCount += 1
-        print('%s - Shift pressed idle time was %s' % (str(wiggleCount), str(currentTime)))
-        try:
-            for i in range(idleTime-2):
-                time.sleep(1)
-        except KeyboardInterrupt:
-            print('Exiting, total idles avoided: %s' % str(wiggleCount))
-            run = False
-    else:
-        try:
-            time.sleep(1)
-        except KeyboardInterrupt:
-            print('Exiting, total idles avoided: %s' % str(wiggleCount))
-            run = False
+if __name__ == '__main__':
+    main()

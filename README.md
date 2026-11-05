@@ -10,21 +10,21 @@ apps like Microsoft Teams or Slack keep showing you as *Active*.
 1. Prompts for your idle timeout in minutes.
 2. Polls the real system idle time every second
    (`win32api.GetTickCount() - win32api.GetLastInputInfo()`).
-3. When idle time reaches the threshold, it presses **Shift** twice, then waits
-   roughly one full timeout period before the next check.
+3. When idle time reaches the threshold, it presses **Shift** twice (Win32
+   `keybd_event` via `ctypes`), then waits roughly one full timeout period.
 4. On `Ctrl+C` it prints how many idle periods were prevented and exits.
 
 ## Requirements
 
 - Windows (uses Win32 APIs; will not run on macOS/Linux)
 - Python 3
-- [`pywin32`](https://pypi.org/project/pywin32/),
-  [`pyautogui`](https://pypi.org/project/pyautogui/)
+- [`pywin32`](https://pypi.org/project/pywin32/) only — key injection uses
+  stdlib `ctypes`, no other dependencies
 
 ## Install
 
 ```bat
-pip install pywin32 pyautogui
+pip install pywin32
 git clone https://github.com/thinktwisted/IdleBuster
 cd IdleBuster
 ```
@@ -33,6 +33,8 @@ cd IdleBuster
 
 ```bat
 python IdleBuster.py
+What is your idle time [1-60 minutes]? 7
+7 is out of range, enter 1-60
 What is your idle time [1-60 minutes]? 5
 Idle time [sec]: 300
 1 - Shift pressed idle time was 298.53
@@ -50,9 +52,6 @@ window is open — closing it stops IdleBuster.
 ## Limitations
 
 - **Windows only.**
-- **No range validation.** The prompt says 1–60 minutes, but `0` and negative
-  values are accepted and cause a tight loop of synthetic keypresses every
-  ~2 s; values above 60 are accepted silently. Enter a real 1–60.
 - The synthesized Shift goes to whichever window is focused. Standalone Shift
   is harmless in practice, but it is still injected input.
 - Once the workstation is locked (`Win+L`), key injection fails and the script
